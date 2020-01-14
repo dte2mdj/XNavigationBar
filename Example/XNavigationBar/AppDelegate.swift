@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import XNavigationBar
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -14,8 +15,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
+        let navBar = XNavigationBar.shared
+        navBar.navTitleColor = .purple
+        navBar.navShadowColor = .red
+        navBar.navTintColor = .blue
+        navBar.navBackgroundColor = XNavigationBar.rgba(r: 234, g: 234, b: 234, a: 1.0)
+        
         return true
     }
 

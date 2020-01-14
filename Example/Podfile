@@ -3,9 +3,5 @@ use_frameworks!
 target 'XNavigationBar_Example' do
   pod 'XNavigationBar', :path => '../'
 
-  target 'XNavigationBar_Tests' do
-    inherit! :search_paths
-
-    
-  end
+  
 end
