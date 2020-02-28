@@ -18,9 +18,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         let navBar = XNavigationBar.shared
-        navBar.navTitleColor = .purple
+        navBar.navTitleColor = .brown
         navBar.navTintColor = .orange
-        navBar.navShadowColor = .green
+        navBar.navShadowColor = .purple
         navBar.navTintColor = .blue
         
         return true

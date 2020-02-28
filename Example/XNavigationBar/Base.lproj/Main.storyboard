@@ -85,7 +85,7 @@
         <!--详情页-->
         <scene sceneID="i7P-RF-Lyq">
             <objects>
-                <viewController id="agf-Ur-5RM" sceneMemberID="viewController">
+                <viewController id="agf-Ur-5RM" customClass="TestImagePickerController" customModule="XNavigationBar_Example" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="TNi-Tp-ZQy"/>
                         <viewControllerLayoutGuide type="bottom" id="Sv2-K2-HWT"/>
@@ -94,17 +94,38 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="我是详情啊详情" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vII-D1-csx">
-                                <rect key="frame" x="127" y="313" width="121.5" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" systemColor="systemPinkColor" red="1" green="0.1764705882" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ady-k2-Gdm">
+                                <rect key="frame" x="18" y="20" width="339" height="40"/>
+                                <color key="backgroundColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="JF2-fW-OMi"/>
+                                </constraints>
+                                <state key="normal" title="打开相册">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="photoButtonEvent:" destination="agf-Ur-5RM" eventType="touchUpInside" id="igo-Hu-Mah"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lPo-Vi-zF1">
+                                <rect key="frame" x="20" y="126" width="335" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="uK7-3U-Ffi"/>
+                                </constraints>
+                                <state key="normal" title="PUSH"/>
+                                <connections>
+                                    <segue destination="9fP-ZP-FES" kind="show" id="9Pl-PX-opx"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="vII-D1-csx" firstAttribute="centerX" secondItem="Lgj-4c-eQi" secondAttribute="centerX" id="0zR-JE-8ek"/>
-                            <constraint firstItem="vII-D1-csx" firstAttribute="centerY" secondItem="Lgj-4c-eQi" secondAttribute="centerY" id="ibS-yP-7ko"/>
+                            <constraint firstAttribute="trailing" secondItem="lPo-Vi-zF1" secondAttribute="trailing" constant="20" id="0O4-MD-h2T"/>
+                            <constraint firstAttribute="trailing" secondItem="Ady-k2-Gdm" secondAttribute="trailing" constant="18" id="6Jh-YW-aoU"/>
+                            <constraint firstItem="Ady-k2-Gdm" firstAttribute="leading" secondItem="Lgj-4c-eQi" secondAttribute="leading" constant="18" id="6VE-1a-arX"/>
+                            <constraint firstItem="lPo-Vi-zF1" firstAttribute="top" secondItem="Ady-k2-Gdm" secondAttribute="bottom" constant="66" id="msn-ie-qvD"/>
+                            <constraint firstItem="lPo-Vi-zF1" firstAttribute="leading" secondItem="Lgj-4c-eQi" secondAttribute="leading" constant="20" id="sLR-O5-D2L"/>
+                            <constraint firstItem="Ady-k2-Gdm" firstAttribute="top" secondItem="TNi-Tp-ZQy" secondAttribute="bottom" constant="20" id="xZo-PO-ing"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="详情页" id="MGu-pR-Erf"/>
@@ -120,6 +141,25 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oPy-YS-bC7" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="3522" y="134"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="t7g-oA-ERI">
+            <objects>
+                <viewController id="9fP-ZP-FES" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="i0S-vn-vfS"/>
+                        <viewControllerLayoutGuide type="bottom" id="42V-aP-bAW"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="RTt-O3-w5x">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="284-uF-635"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="pFU-1e-JdA" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4252" y="126"/>
         </scene>
         <!--Item-->
         <scene sceneID="kom-oX-fDs">

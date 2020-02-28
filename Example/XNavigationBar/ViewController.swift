@@ -10,15 +10,12 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
+        navBackgroundAlpha = 0
+        view.backgroundColor = .groupTableViewBackground
     }
 
     override func didReceiveMemoryWarning() {

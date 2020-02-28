@@ -266,13 +266,15 @@ extension UINavigationBar {
     /// 更新背景透明度
     /// - Parameter alpha: CGFloat
     func setNeedsUpdate(backgroundAlpha alpha: CGFloat) {
-        guard let sysBackgroundView = sysBackgroundView else { return }
         
-        if #available(iOS 11.0, *) {
-            sysBackgroundView.subviews.forEach { $0.alpha = alpha }
-        } else {
-            sysBackgroundView.alpha = alpha
-        }
+        backgroundView.alpha = alpha
+//        guard let sysBackgroundView = sysBackgroundView else { return }
+        
+//        if #available(iOS 11.0, *) {
+//            backgroundView.subviews.forEach { $0.alpha = alpha }
+//        } else {
+//            backgroundView.alpha = alpha
+//        }
     }
     
     /// 更新分隔线颜色
@@ -613,9 +615,10 @@ extension UINavigationController {
         guard pushConfig.isNeedUpdate else { return }
         
         let progress = pushConfig.progress
-        let fromVC = coordinator.viewController(forKey: .from)
-        let toVC = coordinator.viewController(forKey: .to)
-        navigationBarUpdate(from: fromVC, to: toVC, progress: progress)
+        if let fromVC = coordinator.viewController(forKey: .from),
+            let toVC = coordinator.viewController(forKey: .to) {
+            navigationBarUpdate(from: fromVC, to: toVC, progress: progress)
+        }
     }
     
     // MARK: pop 配置
@@ -657,9 +660,10 @@ extension UINavigationController {
         guard popConfig.isNeedUpdate else { return }
         
         let progress = popConfig.progress
-        let fromVC = coordinator.viewController(forKey: .from)
-        let toVC = coordinator.viewController(forKey: .to)
-        navigationBarUpdate(from: fromVC, to: toVC, progress: progress)
+        if let fromVC = coordinator.viewController(forKey: .from),
+            let toVC = coordinator.viewController(forKey: .to) {
+            navigationBarUpdate(from: fromVC, to: toVC, progress: progress)
+        }
     }
     
 }
@@ -690,15 +694,15 @@ private extension UINavigationController {
     }
     
     /// navigationBar 更新
-    /// - Parameter color: 背景-图片
-    func setNeedsNavigationBarUpdate(backgroundImage image: UIImage) {
-        navigationBar.setNeedsUpdate(backgroundImage: image)
+    /// - Parameter alpha: 分隔线-颜色
+    func setNeedsNavigationBarUpdate(shadowColor color: UIColor) {
+        navigationBar.setNeedsUpdate(shadowColor: color)
     }
     
     /// navigationBar 更新
-    /// - Parameter color: 背景-颜色
-    func setNeedsNavigationBarUpdate(backgroundColor color: UIColor) {
-        navigationBar.setNeedsUpdate(backgroundColor: color)
+    /// - Parameter color: 背景-图片
+    func setNeedsNavigationBarUpdate(backgroundImage image: UIImage) {
+        navigationBar.setNeedsUpdate(backgroundImage: image)
     }
     
     /// navigationBar 更新
@@ -708,9 +712,9 @@ private extension UINavigationController {
     }
     
     /// navigationBar 更新
-    /// - Parameter alpha: 分隔线-透明度
-    func setNeedsNavigationBarUpdate(shadowColor color: UIColor) {
-        navigationBar.setNeedsUpdate(shadowColor: color)
+    /// - Parameter color: 背景-颜色
+    func setNeedsNavigationBarUpdate(backgroundColor color: UIColor) {
+        navigationBar.setNeedsUpdate(backgroundColor: color)
     }
     
     /// navigationBar 更新
@@ -728,39 +732,37 @@ private extension UINavigationController {
         setNeedsNavigationBarUpdate(shadowColor: vc.navShadowColor)
     }
     
-    func navigationBarUpdate(from fromVC: UIViewController?, to toVC: UIViewController?, progress: CGFloat) {
-        
-        // 更改背景色
-        let from_backgroundColor = fromVC?.navBackgroundColor ?? .clear
-        let to_backgroundColor = toVC?.navBackgroundColor ?? .clear
-        if from_backgroundColor != to_backgroundColor {
-            let backgroundColor = transitionColor(from: from_backgroundColor, to: to_backgroundColor, percent: progress)
-            setNeedsNavigationBarUpdate(backgroundColor: backgroundColor)
-        }
-        
+    func navigationBarUpdate(from: UIViewController, to: UIViewController, progress: CGFloat) {
+        // 更新标题颜色
+        setNeedsNavigationBarUpdate(titleColor: to.navTitleColor)
+    
         // tint
-        let from_tintColor = fromVC?.navTintColor ?? .clear
-        let to_tintColor = toVC?.navTintColor ?? .clear
-        if from_tintColor != to_tintColor {
-            let tintColor = transitionColor(from: from_tintColor, to: to_tintColor, percent: progress)
-            setNeedsNavigationBarUpdate(tintColor: tintColor)
+        var to_tintColor = to.navTintColor
+        if from.navTintColor != to_tintColor {
+            to_tintColor = transitionColor(from: from.navTintColor, to: to_tintColor, percent: progress)
         }
-        
-        // 背景透明度
-        let from_alpha = fromVC?.navBackgroundAlpha ?? 0
-        let to_alpha = toVC?.navBackgroundAlpha ?? 0
-        if from_alpha != to_alpha {
-            let alpha = transitionAlpha(from: from_alpha, to: to_alpha, percent: progress)
-            setNeedsNavigationBarUpdate(backgroundAlpha: alpha)
-        }
+        setNeedsNavigationBarUpdate(tintColor: to_tintColor)
         
         // 分隔线
-        let from_shadowColor = fromVC?.navShadowColor ?? .clear
-        let to_shadowColor = toVC?.navShadowColor ?? .clear
-        if from_shadowColor != to_shadowColor {
-            let shadowColor = transitionColor(from: from_shadowColor, to: to_shadowColor, percent: progress)
-            setNeedsNavigationBarUpdate(shadowColor: shadowColor)
+        var to_shadowColor = to.navShadowColor
+        if from.navShadowColor != to_shadowColor {
+            to_shadowColor = transitionColor(from: from.navShadowColor, to: to_shadowColor, percent: progress)
         }
+        setNeedsNavigationBarUpdate(shadowColor: to_shadowColor)
+        
+        // 背景透明度
+        var to_alpha = to.navBackgroundAlpha
+        if from.navBackgroundAlpha != to_alpha {
+            to_alpha = transitionAlpha(from: from.navBackgroundAlpha, to: to_alpha, percent: progress)
+        }
+        setNeedsNavigationBarUpdate(backgroundAlpha: to_alpha)
+        
+        // 更改背景色
+        var to_backgroundColor = to.navBackgroundColor
+        if from.navBackgroundColor != to_backgroundColor {
+            to_backgroundColor = transitionColor(from: from.navBackgroundColor, to: to_backgroundColor, percent: progress)
+        }
+        setNeedsNavigationBarUpdate(backgroundColor: to_backgroundColor)
     }
     
     /// 过渡色
@@ -838,9 +840,10 @@ extension UINavigationController: UINavigationBarDelegate {
             return
         }
         
-        let fromVC = coordinator.viewController(forKey: .from)
-        let toVC = coordinator.viewController(forKey: .to)
-        navigationBarUpdate(from: fromVC, to: toVC, progress: percentComplete)
+        if let fromVC = coordinator.viewController(forKey: .from),
+            let toVC = coordinator.viewController(forKey: .to) {
+            navigationBarUpdate(from: fromVC, to: toVC, progress: percentComplete)
+        }
         
         x_updateInteractiveTransition(percentComplete)
     }

@@ -1,16 +1,23 @@
 PODS:
+  - TZImagePickerController (3.2.9)
   - XNavigationBar (0.1.0)
 
 DEPENDENCIES:
+  - TZImagePickerController
   - XNavigationBar (from `../`)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - TZImagePickerController
 
 EXTERNAL SOURCES:
   XNavigationBar:
     :path: "../"
 
 SPEC CHECKSUMS:
+  TZImagePickerController: 1f92968aa0e98a06b9e2eccca8560acc19254257
   XNavigationBar: 80a9bae697d512756926082565e4545abdae95af
 
-PODFILE CHECKSUM: 4fe5aff7707c3703d8792ef6d354d994b9116aa2
+PODFILE CHECKSUM: 6e4ca79a3b6fabc5809f6605642672249ba8853e
 
 COCOAPODS: 1.9.0.beta.2
