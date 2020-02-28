@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="wMp-0q-Qaj">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="wMp-0q-Qaj">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -18,19 +18,69 @@
                     <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="h7p-8a-kDj">
+                                <rect key="frame" x="137.5" y="273.5" width="100" height="120"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Z4I-mv-KcG">
+                                        <rect key="frame" x="0.0" y="0.0" width="100" height="30"/>
+                                        <state key="normal" title="PUSH"/>
+                                        <connections>
+                                            <segue destination="agf-Ur-5RM" kind="show" id="PYU-ws-gl9"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CN5-vh-r0b">
+                                        <rect key="frame" x="0.0" y="30" width="100" height="30"/>
+                                        <state key="normal" title="PUSH NAV"/>
+                                        <connections>
+                                            <segue destination="dOf-8d-q62" kind="show" id="OPz-p7-osL"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7UO-Mk-bAj">
+                                        <rect key="frame" x="0.0" y="60" width="100" height="30"/>
+                                        <state key="normal" title="PRESENT"/>
+                                        <connections>
+                                            <segue destination="agf-Ur-5RM" kind="presentation" id="dEO-ic-9Hr"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MBg-ac-VXG">
+                                        <rect key="frame" x="0.0" y="90" width="100" height="30"/>
+                                        <state key="normal" title="PRESENT NAV"/>
+                                        <connections>
+                                            <segue destination="dOf-8d-q62" kind="presentation" id="r1h-6B-M7Q"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                            </stackView>
+                        </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="h7p-8a-kDj" firstAttribute="centerX" secondItem="kh9-bI-dsS" secondAttribute="centerX" id="T0A-2z-vuH"/>
+                            <constraint firstItem="h7p-8a-kDj" firstAttribute="centerY" secondItem="kh9-bI-dsS" secondAttribute="centerY" id="TBy-8y-Pe3"/>
+                        </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="首页" id="uwc-G0-gTi">
-                        <barButtonItem key="rightBarButtonItem" title="PUSH" id="bna-rT-GRh">
-                            <connections>
-                                <segue destination="agf-Ur-5RM" kind="show" id="BhA-SH-8ZL"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" title="首页" id="uwc-G0-gTi"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2020" y="133.5832083958021"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="GE1-3H-XyE">
+            <objects>
+                <navigationController id="dOf-8d-q62" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="tJF-4F-BVd"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="z1Q-Zx-T7u">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="agf-Ur-5RM" kind="relationship" relationship="rootViewController" id="v0O-m5-Ebb"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="AVH-SK-mMN" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2756" y="1079"/>
         </scene>
         <!--详情页-->
         <scene sceneID="i7P-RF-Lyq">
@@ -41,14 +91,26 @@
                         <viewControllerLayoutGuide type="bottom" id="Sv2-K2-HWT"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="Lgj-4c-eQi">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="我是详情啊详情" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vII-D1-csx">
+                                <rect key="frame" x="127" y="313" width="121.5" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" systemColor="systemPinkColor" red="1" green="0.1764705882" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="vII-D1-csx" firstAttribute="centerX" secondItem="Lgj-4c-eQi" secondAttribute="centerX" id="0zR-JE-8ek"/>
+                            <constraint firstItem="vII-D1-csx" firstAttribute="centerY" secondItem="Lgj-4c-eQi" secondAttribute="centerY" id="ibS-yP-7ko"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="详情页" id="MGu-pR-Erf"/>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="color" keyPath="navShadowColor">
-                            <color key="value" systemColor="systemGreenColor" red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="value" systemColor="systemPurpleColor" red="0.68627450980000004" green="0.32156862749999998" blue="0.87058823529999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         </userDefinedRuntimeAttribute>
                         <userDefinedRuntimeAttribute type="color" keyPath="navTitleColor">
                             <color key="value" systemColor="systemGreenColor" red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -57,7 +119,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oPy-YS-bC7" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2818" y="134"/>
+            <point key="canvasLocation" x="3522" y="134"/>
         </scene>
         <!--Item-->
         <scene sceneID="kom-oX-fDs">
@@ -84,6 +146,7 @@
                 <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="wMp-0q-Qaj" sceneMemberID="viewController">
                     <toolbarItems/>
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="tOe-on-BMj">
+                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBar>
@@ -96,4 +159,8 @@
             <point key="canvasLocation" x="141.59999999999999" y="133.5832083958021"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="dEO-ic-9Hr"/>
+        <segue reference="OPz-p7-osL"/>
+    </inferredMetricsTieBreakers>
 </document>
