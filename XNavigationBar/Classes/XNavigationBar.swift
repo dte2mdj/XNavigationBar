@@ -204,6 +204,7 @@ extension UINavigationBar {
             guard let imageView = objc_getAssociatedObject(self, &X_AssociatedKeys.backgroundView) as? UIImageView else {
                 let imageView = UIImageView()
                 imageView.contentMode = .scaleAspectFill
+                imageView.clipsToBounds = true
                 if let image = kNavBar.navBackgroundImage {
                     imageView.image = image
                 } else {
@@ -253,7 +254,7 @@ extension UINavigationBar {
     
     /// 更新背景图
     /// - Parameter color: UIColor
-    func setNeedsUpdate(backgroundImage image: UIImage) {
+    func setNeedsUpdate(backgroundImage image: UIImage?) {
         backgroundView.image = image
     }
     
@@ -424,6 +425,7 @@ extension UIViewController {
         }
         set {
             objc_setAssociatedObject(self, &X_AssociatedKeys.navBackgroundImage, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            navigationController?.setNeedsNavigationBarUpdate(backgroundImage: newValue)
         }
     }
     
@@ -701,7 +703,7 @@ private extension UINavigationController {
     
     /// navigationBar 更新
     /// - Parameter color: 背景-图片
-    func setNeedsNavigationBarUpdate(backgroundImage image: UIImage) {
+    func setNeedsNavigationBarUpdate(backgroundImage image: UIImage?) {
         navigationBar.setNeedsUpdate(backgroundImage: image)
     }
     
