@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
   s.name             = 'XNavigationBar'
   s.version          = '0.1.0'
-  s.summary          = 'A short description of XNavigationBar.'
+  s.summary          = '设置状态栏、导航栏按钮、标题、颜色、透明度'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?

@@ -25,9 +25,12 @@ public class XNavigationBar: NSObject {
     }
     
     /// 标题颜色
-    @objc public var navTitleColor: UIColor = .black
+    @objc public var navTitleColor: UIColor {
+        get { navTitleAttributes[.foregroundColor] as? UIColor ?? .black }
+        set { navTitleAttributes[.foregroundColor] = newValue }
+    }
     /// 标题属性
-    fileprivate var navTitleAttributes: [NSAttributedString.Key: Any] = [
+    @objc public var navTitleAttributes: [NSAttributedString.Key: Any] = [
         .foregroundColor: UIColor.black
     ]
     /// item 的文字颜色
@@ -392,14 +395,14 @@ extension UIViewController {
     /// 标题颜色
     @objc public var navTitleColor: UIColor {
         get {
-            return objc_getAssociatedObject(self, &X_AssociatedKeys.navTitleColor) as? UIColor ?? kNavBar.navTitleColor
+            return navTitleAttributes[.foregroundColor] as? UIColor ?? kNavBar.navTitleColor
         }
         set {
-            objc_setAssociatedObject(self, &X_AssociatedKeys.navTitleColor, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            navTitleAttributes[.foregroundColor] = newValue
         }
     }
     
-    private var navTitleAttributes: [NSAttributedString.Key: Any] {
+    var navTitleAttributes: [NSAttributedString.Key: Any] {
         get {
             return objc_getAssociatedObject(self, &X_AssociatedKeys.navTitleAttributes) as? [NSAttributedString.Key: Any] ?? kNavBar.navTitleAttributes
         }
@@ -503,7 +506,7 @@ extension UIViewController {
         
         isPushToNextFinished = false
         navigationController?.setNeedsNavigationBarUpdate(tintColor: navTintColor)
-        navigationController?.setNeedsNavigationBarUpdate(titleColor: navTitleColor)
+        navigationController?.setNeedsNavigationBarUpdate(titleAttributes: navTitleAttributes)
     }
     
     /// 替换系统方法: viewDidAppear(_:)
@@ -689,6 +692,10 @@ private extension UINavigationController {
         navigationBar.titleTextAttributes = attributes
     }
     
+    func setNeedsNavigationBarUpdate(titleAttributes attributes: [NSAttributedString.Key: Any]) {
+        navigationBar.titleTextAttributes = attributes
+    }
+    
     /// navigationBar 更新
     /// - Parameter color: tint-颜色
     func setNeedsNavigationBarUpdate(tintColor color: UIColor) {
@@ -729,14 +736,14 @@ private extension UINavigationController {
             setNeedsNavigationBarUpdate(backgroundColor: vc.navBackgroundColor)
         }
         setNeedsNavigationBarUpdate(tintColor: vc.navTintColor)
-        setNeedsNavigationBarUpdate(titleColor: vc.navTitleColor)
+        setNeedsNavigationBarUpdate(titleAttributes: vc.navTitleAttributes)
         setNeedsNavigationBarUpdate(backgroundAlpha: vc.navBackgroundAlpha)
         setNeedsNavigationBarUpdate(shadowColor: vc.navShadowColor)
     }
     
     func navigationBarUpdate(from: UIViewController, to: UIViewController, progress: CGFloat) {
         // 更新标题颜色
-        setNeedsNavigationBarUpdate(titleColor: to.navTitleColor)
+        setNeedsNavigationBarUpdate(titleAttributes: to.navTitleAttributes)
     
         // tint
         var to_tintColor = to.navTintColor

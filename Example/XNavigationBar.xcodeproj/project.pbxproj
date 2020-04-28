@@ -150,7 +150,7 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
-						DevelopmentTeam = LYF8G4H56R;
+						DevelopmentTeam = 3N4QT8PD65;
 						LastSwiftMigration = 1130;
 					};
 				};
@@ -376,7 +376,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				DEVELOPMENT_TEAM = LYF8G4H56R;
+				DEVELOPMENT_TEAM = 3N4QT8PD65;
 				INFOPLIST_FILE = XNavigationBar/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
@@ -395,7 +395,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				DEVELOPMENT_TEAM = LYF8G4H56R;
+				DEVELOPMENT_TEAM = 3N4QT8PD65;
 				INFOPLIST_FILE = XNavigationBar/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
