@@ -43,10 +43,10 @@ extension TestImagePickerController: TZImagePickerControllerDelegate {
             delegate: self,
             pushPhotoPickerVc: true)!
         
-//        imagePicker.modalPresentationStyle = .overFullScreen
-//        imagePicker.navTitleColor = .blue
-//        imagePicker.barItemTextColor = navTintColor
-//        imagePicker.naviBgColor = navBackgroundColor
+        imagePicker.modalPresentationStyle = .overFullScreen
+        imagePicker.navTitleColor = .blue
+        imagePicker.barItemTextColor = navTintColor
+        imagePicker.naviBgColor = navBackgroundColor
         
         imagePicker.allowPickingOriginalPhoto = false
         imagePicker.allowPickingVideo = false
