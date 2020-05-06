@@ -399,6 +399,7 @@ extension UIViewController {
         }
         set {
             navTitleAttributes[.foregroundColor] = newValue
+            navigationController?.setNeedsNavigationBarUpdate(titleAttributes: navTitleAttributes)
         }
     }
     
