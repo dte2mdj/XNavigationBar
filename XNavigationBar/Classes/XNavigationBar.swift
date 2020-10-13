@@ -515,7 +515,7 @@ extension UIViewController {
         defer { x_viewDidAppear(animated) }
         
         // 如果当前控制器是 nav, 则设置代理为自身，
-        if let nav = self as? UINavigationController { nav.delegate = nav }
+        if let nav = self as? UINavigationController, nav.delegate == nil { nav.delegate = nav }
         if navigationController?.viewControllers.first != self { isPushToCurrentFinished = true }
     }
     
