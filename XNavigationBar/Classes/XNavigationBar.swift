@@ -136,6 +136,8 @@ extension XNavigationBarSwizzle where Self: UINavigationBar {
     static func swizzleMethods() {
         x_swizzleInstanceMethod(originalSelector: #selector(layoutSubviews),
                                 swizzledSelector: #selector(x_layoutSubviews))
+        x_swizzleInstanceMethod(originalSelector: #selector(didAddSubview(_:)),
+                                swizzledSelector: #selector(x_didAddSubview(_:)))
     }
 }
 
@@ -349,14 +351,18 @@ extension UINavigationBar {
     }
     
     /// 重写系统方法，获取 sysBackgroundView ，并添加自定义view
-    open override func didAddSubview(_ subview: UIView) {
-        super.didAddSubview(subview)
+    @objc func x_didAddSubview(_ subview: UIView) {
+        x_didAddSubview(subview)
         
-        guard let cls = NSClassFromString("_UIBarBackground"), subview.isKind(of: cls) else { return }
-        sysBackgroundView = subview
+        // 系统导航背景
+        if let cls = NSClassFromString("_UIBarBackground"), subview.isKind(of: cls) {
+            sysBackgroundView = subview
+            
+            subview.insertSubview(backgroundView, at: 0)
+            subview.addSubview(shadowView)
+        }
         
-        subview.insertSubview(backgroundView, at: 0)
-        subview.addSubview(shadowView)
+        print(subview)
     }
 }
 
