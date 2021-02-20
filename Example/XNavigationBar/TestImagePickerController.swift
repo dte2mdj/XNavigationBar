@@ -12,9 +12,24 @@ class TestImagePickerController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        view.backgroundColor = .red
+        
+        statusBarStyle = .default
+        navBackgroundImage = nil
         navBackgroundColor = .yellow
     }
 
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        
+        if statusBarStyle == .lightContent {
+            statusBarStyle = .default
+        } else {
+            statusBarStyle = .lightContent
+        }
+    }
+    
     @IBAction func photoButtonEvent(_ sender: Any) {
         showImagePickerController()
     }
@@ -43,7 +58,6 @@ extension TestImagePickerController: TZImagePickerControllerDelegate {
             delegate: self,
             pushPhotoPickerVc: true)!
         
-        imagePicker.modalPresentationStyle = .overFullScreen
         imagePicker.navTitleColor = .blue
         imagePicker.barItemTextColor = navTintColor
         imagePicker.naviBgColor = navBackgroundColor

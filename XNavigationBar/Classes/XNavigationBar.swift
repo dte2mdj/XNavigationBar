@@ -135,28 +135,31 @@ extension XNavigationBarSwizzle {
 extension XNavigationBarSwizzle where Self: UINavigationBar {
     static func swizzleMethods() {
         x_swizzleInstanceMethod(originalSelector: #selector(layoutSubviews),
-                                swizzledSelector: #selector(x_layoutSubviews))
+                                swizzledSelector: #selector(x_nav_bar_layoutSubviews))
         x_swizzleInstanceMethod(originalSelector: #selector(didAddSubview(_:)),
-                                swizzledSelector: #selector(x_didAddSubview(_:)))
+                                swizzledSelector: #selector(x_nav_bar_didAddSubview(_:)))
     }
 }
 
 extension XNavigationBarSwizzle where Self: UINavigationController {
     static func swizzleMethods() {
         x_swizzleInstanceMethod(originalSelector: NSSelectorFromString("_updateInteractiveTransition:"),
-                                swizzledSelector: #selector(x_updateInteractiveTransition(_:)))
+                                swizzledSelector: #selector(x_nav_updateInteractiveTransition(_:)))
+        
+        x_swizzleInstanceMethod(originalSelector: #selector(getter: preferredStatusBarStyle),
+                                swizzledSelector: #selector(getter: x_nav_preferredStatusBarStyle))
         
         x_swizzleInstanceMethod(originalSelector: #selector(pushViewController(_:animated:)),
-                                swizzledSelector: #selector(x_pushViewController(_:animated:)))
+                                swizzledSelector: #selector(x_nav_pushViewController(_:animated:)))
         
         x_swizzleInstanceMethod(originalSelector: #selector(popViewController(animated:)),
-                                swizzledSelector: #selector(x_popViewController(animated:)))
+                                swizzledSelector: #selector(x_nav_popViewController(animated:)))
         
         x_swizzleInstanceMethod(originalSelector: #selector(popToViewController(_:animated:)),
-                                swizzledSelector: #selector(x_popToViewController(_:animated:)))
+                                swizzledSelector: #selector(x_nav_popToViewController(_:animated:)))
         
         x_swizzleInstanceMethod(originalSelector: #selector(popToRootViewController(animated:)),
-                                swizzledSelector: #selector(x_popToRootViewController(animated:)))
+                                swizzledSelector: #selector(x_nav_popToRootViewController(animated:)))
     }
 }
 
@@ -322,8 +325,8 @@ extension UINavigationBar {
         }
     }
     
-    @objc func x_layoutSubviews() {
-        x_layoutSubviews()
+    @objc func x_nav_bar_layoutSubviews() {
+        x_nav_bar_layoutSubviews()
         
         guard let sysBackgroundView = sysBackgroundView else { return }
         
@@ -351,8 +354,8 @@ extension UINavigationBar {
     }
     
     /// 重写系统方法，获取 sysBackgroundView ，并添加自定义view
-    @objc func x_didAddSubview(_ subview: UIView) {
-        x_didAddSubview(subview)
+    @objc func x_nav_bar_didAddSubview(_ subview: UIView) {
+        x_nav_bar_didAddSubview(subview)
         
         // 系统导航背景
         if let cls = NSClassFromString("_UIBarBackground"), subview.isKind(of: cls) {
@@ -393,7 +396,6 @@ extension UIViewController {
         }
         set {
             objc_setAssociatedObject(self, &X_AssociatedKeys.statusBarStyle, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-            guard canUpdateNavColorOrAlpha else { return }
             setNeedsStatusBarAppearanceUpdate()
         }
     }
@@ -505,7 +507,9 @@ extension UIViewController {
 extension UIViewController {
     
     /// 交换后的方法
-    @objc fileprivate var x_preferredStatusBarStyle: UIStatusBarStyle { return statusBarStyle }
+    @objc fileprivate var x_preferredStatusBarStyle: UIStatusBarStyle {
+        statusBarStyle
+    }
     
     /// 替换系统方法: viewWillAppear(_:)
     @objc fileprivate func x_viewWillAppear(_ animated: Bool) {
@@ -533,11 +537,9 @@ extension UIViewController {
     }
     
     @objc fileprivate func x_present(_ viewControllerToPresent: UIViewController, animated: Bool, completion: (() -> Void)? = nil) {
-        
         defer { x_present(viewControllerToPresent, animated: animated, completion: completion) }
         
-        guard let nav = viewControllerToPresent as? UINavigationController, let topVC = nav.topViewController else { return }
-        nav.setNeedsNavigationBarUpdate(toViewController: topVC)
+        print(#function)
     }
     
 }
@@ -546,44 +548,44 @@ extension UIViewController {
 extension UINavigationController {
     
     /// 替换系统方法: pushViewController(_:animated:)
-    @objc fileprivate func x_pushViewController(_ viewController: UIViewController, animated: Bool) {
+    @objc fileprivate func x_nav_pushViewController(_ viewController: UIViewController, animated: Bool) {
         
         configPushTransaction { viewController.isPushToCurrentFinished = true }
         
         CATransaction.begin()
-        x_pushViewController(viewController, animated: animated)
+        x_nav_pushViewController(viewController, animated: animated)
         CATransaction.commit()
     }
     
-    @objc fileprivate func x_popViewController(animated: Bool) -> UIViewController? {
+    @objc fileprivate func x_nav_popViewController(animated: Bool) -> UIViewController? {
         
         configPopTransaction()
         
         CATransaction.begin()
-        let vc = x_popViewController(animated: animated)
+        let vc = x_nav_popViewController(animated: animated)
         CATransaction.commit()
         return vc
     }
     
     /// 替换系统方法: popToViewController(_:animated:)
-    @objc fileprivate func x_popToViewController(_ viewController: UIViewController, animated: Bool) -> [UIViewController]? {
+    @objc fileprivate func x_nav_popToViewController(_ viewController: UIViewController, animated: Bool) -> [UIViewController]? {
         
         configPopTransaction()
         
         CATransaction.begin()
-        let vcs = x_popToViewController(viewController, animated: animated)
+        let vcs = x_nav_popToViewController(viewController, animated: animated)
         CATransaction.commit()
         
         return vcs
     }
     
     /// 替换系统方法: popToRootViewController(animated:)
-    @objc fileprivate func x_popToRootViewController(animated: Bool) -> [UIViewController]? {
+    @objc fileprivate func x_nav_popToRootViewController(animated: Bool) -> [UIViewController]? {
         
         configPopTransaction()
         
         CATransaction.begin()
-        let vcs = x_popToRootViewController(animated: animated)
+        let vcs = x_nav_popToRootViewController(animated: animated)
         CATransaction.commit()
         return vcs
     }
@@ -683,8 +685,8 @@ extension UINavigationController {
 // MARK: 状态栏设置
 extension UINavigationController {
     /// 设置状态栏颜色
-    open override var preferredStatusBarStyle: UIStatusBarStyle {
-        return self.topViewController?.preferredStatusBarStyle ?? kNavBar.statusBarStyle
+    @objc fileprivate var x_nav_preferredStatusBarStyle: UIStatusBarStyle {
+        topViewController?.preferredStatusBarStyle ?? kNavBar.statusBarStyle
     }
 }
 
@@ -849,10 +851,10 @@ extension UINavigationController: UINavigationBarDelegate {
     }
     
     /// 替换系统方法: _updateInteractiveTransition:
-    @objc func x_updateInteractiveTransition(_ percentComplete: CGFloat) {
+    @objc func x_nav_updateInteractiveTransition(_ percentComplete: CGFloat) {
         
         guard let coordinator = transitionCoordinator else {
-            x_updateInteractiveTransition(percentComplete)
+            x_nav_updateInteractiveTransition(percentComplete)
             return
         }
         
@@ -861,7 +863,7 @@ extension UINavigationController: UINavigationBarDelegate {
             navigationBarUpdate(from: fromVC, to: toVC, progress: percentComplete)
         }
         
-        x_updateInteractiveTransition(percentComplete)
+        x_nav_updateInteractiveTransition(percentComplete)
     }
 }
 
