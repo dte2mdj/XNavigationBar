@@ -247,9 +247,6 @@ extension UINavigationBar {
         }
     }
     
-    /// nav大小
-    var navSize: CGSize { backgroundView.frame.size }
-    
     /// 设置导航栏垂直方向偏移
     var translationY: CGFloat {
         get {
@@ -364,8 +361,6 @@ extension UINavigationBar {
             subview.insertSubview(backgroundView, at: 0)
             subview.addSubview(shadowView)
         }
-        
-        print(subview)
     }
 }
 
