@@ -15,7 +15,9 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
         
         view.backgroundColor = .groupTableViewBackground
-        navBackgroundImage = UIImage(named: "nav01")
+//        navBackgroundImage = UIImage(named: "nav01")
+//        
+//        navShadowColor = .red
     }
 
     override func didReceiveMemoryWarning() {

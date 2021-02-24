@@ -13,11 +13,11 @@ class TestImagePickerController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .red
+        view.backgroundColor = .cyan
         
         statusBarStyle = .default
-        navBackgroundImage = nil
         navBackgroundColor = .yellow
+        navShadowColor = .blue
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -32,6 +32,24 @@ class TestImagePickerController: UIViewController {
     
     @IBAction func photoButtonEvent(_ sender: Any) {
         showImagePickerController()
+//        pushTest()
+    }
+    
+    func pushTest() {
+        
+        
+        let vc = UIViewController()
+        
+        vc.view.backgroundColor = .blue
+        vc.navigationItem.leftItemsSupplementBackButton = true // 设置 leftBarButtonItem 不会占用掉返回按钮
+        
+        if #available(iOS 14.0, *) {
+            vc.navigationItem.leftBarButtonItem = UIBarButtonItem(systemItem: .bookmarks)
+        } else {
+            // Fallback on earlier versions
+        }
+        navigationController?.pushViewController(vc, animated: true)
+        
     }
     
     /*
@@ -53,14 +71,13 @@ extension TestImagePickerController: TZImagePickerControllerDelegate {
     func showImagePickerController() {
       
         let imagePicker = TZImagePickerController(
-            maxImagesCount: 1,
+            maxImagesCount: 9,
             columnNumber: 3,
             delegate: self,
             pushPhotoPickerVc: true)!
         
-        imagePicker.navTitleColor = .blue
-        imagePicker.barItemTextColor = navTintColor
-        imagePicker.naviBgColor = navBackgroundColor
+//        imagePicker.barItemTextColor = navTintColor
+//        imagePicker.navBackgroundColor = .orange
         
         imagePicker.allowPickingOriginalPhoto = false
         imagePicker.allowPickingVideo = false

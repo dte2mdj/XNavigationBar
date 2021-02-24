@@ -1,7 +1,7 @@
 {
   "name": "XNavigationBar",
-  "version": "0.1.0",
-  "summary": "A short description of XNavigationBar.",
+  "version": "0.1.2",
+  "summary": "设置状态栏、导航栏按钮、标题、颜色、透明度",
   "description": "TODO: Add long description of the pod here.",
   "homepage": "https://github.com/dte2mdj/XNavigationBar",
   "license": {
@@ -13,7 +13,7 @@
   },
   "source": {
     "git": "https://github.com/dte2mdj/XNavigationBar.git",
-    "tag": "0.1.0"
+    "tag": "0.1.2"
   },
   "swift_versions": "5.0",
   "platforms": {

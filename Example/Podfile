@@ -1,5 +1,5 @@
 # github源
-source 'https://github.com/CocoaPods/Specs.git'
+# source 'https://github.com/CocoaPods/Specs.git'
 
 use_frameworks!
 
@@ -7,5 +7,5 @@ target 'XNavigationBar_Example' do
   pod 'XNavigationBar', :path => '../'
 
   pod 'TZImagePickerController', '~> 3.2.9'
-  
+  pod 'LookinServer', :configurations => ['Debug']  
 end
