@@ -188,75 +188,27 @@ extension UIViewController: XNavigationBarSwizzle {}
 // MARK: - UINavigationBar 扩展
 extension UINavigationBar {
     // MARK: 添加自定义属性
-    
     struct X_AssociatedKeys {
-        static var sysBackgroundView: Void?
         
-        static var backgroundView: Void?
-        
-        static var navBgView: Void?
         static var navBgColorView: Void?
         static var navBgImageView: Void?
         static var navShadowView: Void?
     }
     
-    /// 系统的背景view，在系统添加到  self 之后捕获存储
-    private var sysBackgroundView: UIView? {
+    /// nav 背景 to
+    var navBgImageView: UIImageView {
         get {
-            return objc_getAssociatedObject(self, &X_AssociatedKeys.sysBackgroundView) as? UIView
-        }
-        set {
-            objc_setAssociatedObject(self, &X_AssociatedKeys.sysBackgroundView, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        }
-    }
-    
-//    /// 自定义背景 view，放在系统 sysBackgroundView 的最下层
-//    var backgroundView: UIImageView {
-//        get {
-//            guard let imageView = objc_getAssociatedObject(self, &X_AssociatedKeys.backgroundView) as? UIImageView else {
-//                let imageView = UIImageView()
-//                imageView.contentMode = .scaleAspectFill
-//                imageView.clipsToBounds = true
-//                if let image = kNavBar.navBackgroundImage {
-//                    imageView.image = image
-//                } else {
-//                    imageView.backgroundColor = kNavBar.navBackgroundColor
-//                }
-//
-//                self.backgroundView = imageView
-//                return imageView
-//            }
-//            return imageView
-//        }
-//        set {
-//            objc_setAssociatedObject(self, &X_AssociatedKeys.backgroundView, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-//        }
-//    }
-    
-    /// 背景图层
-    var navBgView: UIView? {
-        get {
-            return objc_getAssociatedObject(self, &X_AssociatedKeys.navBgView) as? UIView
-        }
-        set {
-            objc_setAssociatedObject(self, &X_AssociatedKeys.navBgView, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        }
-    }
-    
-    /// nav 背景颜色
-    var navBgColorView: UIView? {
-        get {
-            return objc_getAssociatedObject(self, &X_AssociatedKeys.navBgColorView) as? UIView
+            return objc_getAssociatedObject(self, &X_AssociatedKeys.navBgColorView) as? UIImageView ?? UIImageView()
         }
         set {
             objc_setAssociatedObject(self, &X_AssociatedKeys.navBgColorView, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
     
-    /// nav 背景图片
-    var navBgImageView: UIImageView? {
+    /// nav 背景 from
+    var navBgImageView1: UIImageView {
         get {
-            return objc_getAssociatedObject(self, &X_AssociatedKeys.navBgImageView) as? UIImageView
+            return objc_getAssociatedObject(self, &X_AssociatedKeys.navBgImageView) as? UIImageView ?? UIImageView()
         }
         set {
             objc_setAssociatedObject(self, &X_AssociatedKeys.navBgImageView, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
@@ -285,34 +237,43 @@ extension UINavigationBar {
     
     /// 更新背景图
     /// - Parameter color: UIColor
-    func setNeedsUpdate(backgroundImage image: UIImage?) {
-        navBgImageView?.image = image
+    func setUpdate(backgroundImage image: UIImage?) {
+        navBgImageView.image = image
+        navBgImageView.backgroundColor = nil
     }
     
     /// 更新背景颜色
     /// - Parameter color: UIColor
-    func setNeedsUpdate(backgroundColor color: UIColor) {
-        navBgColorView?.backgroundColor = color
+    func setUpdate(backgroundColor color: UIColor) {
+        navBgImageView.image = nil
+        navBgImageView.backgroundColor = color
     }
     
     /// 更新背景透明度
     /// - Parameter alpha: CGFloat
     func setNeedsUpdate(backgroundAlpha alpha: CGFloat) {
-        navBgColorView?.alpha = alpha
-        navBgImageView?.alpha = alpha
+        navBgImageView.alpha = alpha
     }
     
     /// 更新背景 图片 -> 颜色
     func setNeedsUpdateBackground(from: UIImage, to: UIColor, progress: CGFloat) {
-        guard let colorView = navBgColorView, let imageView = navBgImageView else { return }
-        imageView.alpha = 1 - progress
-        colorView.alpha = progress
+        navBgImageView1.image = from
+        navBgImageView1.backgroundColor = nil
+        navBgImageView1.alpha = 1 - progress
+        
+        navBgImageView.image = nil
+        navBgImageView.backgroundColor = to
+        navBgImageView.alpha = progress
     }
     /// 更新背景 颜色 -> 图片
     func setNeedsUpdateBackground(from: UIColor, to: UIImage, progress: CGFloat) {
-        guard let colorView = navBgColorView, let imageView = navBgImageView else { return }
-        colorView.alpha = 1 - progress
-        imageView.alpha = progress
+        navBgImageView1.image = nil
+        navBgImageView1.backgroundColor = from
+        navBgImageView1.alpha = 1 - progress
+        
+        navBgImageView.image = to
+        navBgImageView.backgroundColor = nil
+        navBgImageView.alpha = progress
     }
     
     /// 更新分隔线颜色
@@ -359,7 +320,7 @@ extension UINavigationBar {
         
     }
     
-    /// 重写系统方法，获取 sysBackgroundView ，并添加自定义view
+    /// 创建自定义views, 并添加到系统对应层
     @objc func x_nav_bar_didAddSubview(_ subview: UIView) {
         x_nav_bar_didAddSubview(subview)
         
@@ -377,8 +338,6 @@ extension UINavigationBar {
         // 系统导航背景
         if subview.isMember(of: "_UIBarBackground") {
                         
-            navBgView = subview
-            
             assert(subview.subviews.count == 2, "系统 _UIBarBackground 子 view 数量异常，请检查")
             
             // 背景
@@ -393,13 +352,11 @@ extension UINavigationBar {
                 
                 // 添加自定义views
                 do {
-                    let bgColorView = UIView()
-                    bgColorView.backgroundColor = .cyan
-                    navBgColorView = bgColorView
+                    let bgColorView = UIImageView()
+                    navBgImageView = bgColorView
                     
                     let bgImageView = UIImageView()
-                    bgImageView.image = UIImage(named: "nav01")
-                    navBgImageView = bgImageView
+                    navBgImageView1 = bgImageView
 
                     contentView.addSubview(bgColorView)
                     contentView.addSubview(bgImageView)
@@ -894,9 +851,9 @@ private extension UINavigationController {
                 
                 switch attr {
                 case .color(let val):
-                    navigationBar.setNeedsUpdate(backgroundColor: val)
+                    navigationBar.setUpdate(backgroundColor: val)
                 case .image(let val):
-                    navigationBar.setNeedsUpdate(backgroundImage: val)
+                    navigationBar.setUpdate(backgroundImage: val)
                 case .alpha(let val):
                     navigationBar.setNeedsUpdate(backgroundAlpha: val)
                 }
@@ -940,7 +897,6 @@ private extension UINavigationController {
     /// - Parameter color: 背景-图片
     func setNeedsNavigationBarUpdate(backgroundImage image: UIImage?) {
         setNeedsNavigationBarUpdate(types: [.bg(.image(image))])
-        
     }
     
     /// navigationBar 更新
@@ -1000,7 +956,7 @@ private extension UINavigationController {
         if from.navBackgroundColor != to_backgroundColor {
             to_backgroundColor = transitionColor(from: from.navBackgroundColor, to: to_backgroundColor, percent: progress)
         }
-//        setNeedsNavigationBarUpdate(backgroundColor: to_backgroundColor)
+        
         if let img = from.navBackgroundImage, to.navBackgroundImage == nil {
             navigationBar.setNeedsUpdateBackground(from: img, to: to_backgroundColor, progress: progress)
         } else if let img = to.navBackgroundImage, from.navBackgroundImage == nil {
@@ -1102,46 +1058,34 @@ extension UINavigationController: UINavigationControllerDelegate {
         
         guard let coordinator = transitionCoordinator else { return }
         
+        func dealInteractionChanges(_ context: UIViewControllerTransitionCoordinatorContext) {
+            
+            let animations: (UITransitionContextViewControllerKey) -> Void = { key in
+                
+                let from = context.viewController(forKey: .from)!
+                let to = context.viewController(forKey: .to)!
+                
+                let progress: CGFloat = context.isCancelled ? 0 : 1.0
+                navigationController.navigationBarUpdate(from: from, to: to, progress: progress)
+            }
+            
+            if context.isCancelled {
+                let duration = context.transitionDuration * Double(context.percentComplete)
+                UIView.animate(withDuration: duration) { animations(.from) }
+            } else {
+                let duration = context.transitionDuration * Double(1 - context.percentComplete)
+                UIView.animate(withDuration: duration) { animations(.to) }
+            }
+        }
+        
         if #available(iOS 10.0, *) {
             coordinator.notifyWhenInteractionChanges { context in
-                self.dealInteractionChanges(context)
+                dealInteractionChanges(context)
             }
         } else {
             coordinator.notifyWhenInteractionEnds { context in
-                self.dealInteractionChanges(context)
+                dealInteractionChanges(context)
             }
-        }
-    }
-    
-    private func dealInteractionChanges(_ context: UIViewControllerTransitionCoordinatorContext) {
-        
-        let animations: (UITransitionContextViewControllerKey) -> Void = { key in
-            guard let vc = context.viewController(forKey: key) else { return }
-            
-            let from = context.viewController(forKey: .from)!
-            let to = context.viewController(forKey: .to)!
-            
-            // 更改背景色
-            var to_backgroundColor = to.navBackgroundColor
-            
-            let progress: CGFloat = context.isCancelled ? 0 : 1.0
-    
-            if let img = from.navBackgroundImage, to.navBackgroundImage == nil {
-                self.navigationBar.setNeedsUpdateBackground(from: img, to: to_backgroundColor, progress: progress)
-            } else if let img = to.navBackgroundImage, from.navBackgroundImage == nil {
-                self.navigationBar.setNeedsUpdateBackground(from: from.navBackgroundColor, to: img, progress: progress)
-            }
-            
-            // 需要设置代理为自身，如果设置为 UIViewController 时，vc.navigationController 会出现 nil，造成无法更新成功
-//            self.setNeedsNavigationBarUpdate(toViewController: vc)
-        }
-        
-        if context.isCancelled {
-            let duration = context.transitionDuration * Double(context.percentComplete)
-            UIView.animate(withDuration: duration) { animations(.from) }
-        } else {
-            let duration = context.transitionDuration * Double(1 - context.percentComplete)
-            UIView.animate(withDuration: duration) { animations(.to) }
         }
     }
 }

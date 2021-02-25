@@ -31,15 +31,14 @@ class TestImagePickerController: UIViewController {
     }
     
     @IBAction func photoButtonEvent(_ sender: Any) {
-        showImagePickerController()
-//        pushTest()
+//        showImagePickerController()
+        pushTest()
     }
     
     func pushTest() {
         
-        
         let vc = UIViewController()
-        
+        vc.navBackgroundImage = UIImage(named: "nav01")!
         vc.view.backgroundColor = .blue
         vc.navigationItem.leftItemsSupplementBackButton = true // 设置 leftBarButtonItem 不会占用掉返回按钮
         
