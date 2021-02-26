@@ -19,8 +19,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let navBar = XNavigationBar.shared
         navBar.navTitleColor = .red
-        navBar.navShadowColor = .purple
+        navBar.navShadowColor = .red
         navBar.navTintColor = .blue
+        navBar.navBackgroundColor = .purple
+        navBar.statusBarStyle = .lightContent
         
         return true
     }

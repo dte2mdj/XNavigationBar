@@ -16,8 +16,22 @@ class TestImagePickerController: UIViewController {
         view.backgroundColor = .cyan
         
         statusBarStyle = .default
-        navBackgroundColor = .yellow
-        navShadowColor = .blue
+        navBackgroundImage = UIImage(named: "nav02")
+        navShadowColor = .clear
+        
+        let btn = UIButton()
+        btn.backgroundColor = .red
+        btn.frame = CGRect(x: 200, y: 0, width: 100, height: 100)
+        view.addSubview(btn)
+        
+        if #available(iOS 14.0, *) {
+            let action = UIAction { btn in
+                self.pushTest()
+            }
+            btn.addAction(action, for: .touchUpInside)
+        } else {
+            // Fallback on earlier versions
+        }
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -31,14 +45,17 @@ class TestImagePickerController: UIViewController {
     }
     
     @IBAction func photoButtonEvent(_ sender: Any) {
-//        showImagePickerController()
-        pushTest()
+        showImagePickerController()
     }
     
     func pushTest() {
         
         let vc = UIViewController()
         vc.navBackgroundImage = UIImage(named: "nav01")!
+        vc.navBackgroundColor = .cyan
+        vc.navTintColor = .red
+        vc.navTitleColor = .orange
+        vc.title = "小小一只鸟"
         vc.view.backgroundColor = .blue
         vc.navigationItem.leftItemsSupplementBackButton = true // 设置 leftBarButtonItem 不会占用掉返回按钮
         
