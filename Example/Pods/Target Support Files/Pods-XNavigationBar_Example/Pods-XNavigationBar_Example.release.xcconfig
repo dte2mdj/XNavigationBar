@@ -4,6 +4,7 @@ FRAMEWORK_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/TZImagePi
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
 HEADER_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/TZImagePickerController/TZImagePickerController.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/XNavigationBar/XNavigationBar.framework/Headers"
 LD_RUNPATH_SEARCH_PATHS = $(inherited) '@executable_path/Frameworks' '@loader_path/Frameworks'
+OTHER_CFLAGS = $(inherited) -isystem "${PODS_CONFIGURATION_BUILD_DIR}/TZImagePickerController/TZImagePickerController.framework/Headers" -isystem "${PODS_CONFIGURATION_BUILD_DIR}/XNavigationBar/XNavigationBar.framework/Headers" -iframework "${PODS_CONFIGURATION_BUILD_DIR}/TZImagePickerController" -iframework "${PODS_CONFIGURATION_BUILD_DIR}/XNavigationBar"
 OTHER_LDFLAGS = $(inherited) -framework "MobileCoreServices" -framework "Photos" -framework "TZImagePickerController" -framework "XNavigationBar"
 OTHER_SWIFT_FLAGS = $(inherited) -D COCOAPODS
 PODS_BUILD_DIR = ${BUILD_DIR}

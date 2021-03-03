@@ -21,7 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         navBar.navTitleColor = .red
         navBar.navShadowColor = .red
         navBar.navTintColor = .blue
-        navBar.navBackgroundColor = .purple
+        navBar.navBackgroundColor = .lightGray
         navBar.statusBarStyle = .lightContent
         
         return true

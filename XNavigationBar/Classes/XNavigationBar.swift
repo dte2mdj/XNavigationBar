@@ -70,9 +70,17 @@ public class XNavigationBar: NSObject {
     @objc public var statusBarStyle = UIStatusBarStyle.default
     
     /// 黑名单
-    @objc public static var blackList: [String] = [
-        "TZImagePickerController"
+    @objc public static var blacklist: [String] = [
+        "TZImagePickerController",
+        "_UIActivityContentNavigationBar"
     ]
+    
+    static func isInBlacklist(of object: NSObject) -> Bool {
+        for className in blacklist {
+            if object.isMember(of: className) { return true }
+        }
+        return false
+    }
 }
 
 extension XNavigationBar {
@@ -235,11 +243,14 @@ extension UINavigationBar {
         static var navShadowView: Void?
     }
     
+    private class _XwgBgView: UIImageView {}
+    private class _XwgShadowView: UIView {}
+    
     /// nav 背景过渡 view
-    var navBgTransitionView: UIImageView {
+    private var navBgTransitionView: _XwgBgView {
         get {
-            getAssociatedObject(key: &X_AssociatedKeys.navBgTransitionView) { () -> UIImageView in
-                let obj = UIImageView()
+            getAssociatedObject(key: &X_AssociatedKeys.navBgTransitionView) { () -> _XwgBgView in
+                let obj = _XwgBgView()
                 obj.alpha = 0
                 return obj
             }
@@ -248,10 +259,10 @@ extension UINavigationBar {
     }
     
     /// nav 背景 view
-    var navBgView: UIImageView {
+    private var navBgView: _XwgBgView {
         get {
-            getAssociatedObject(key: &X_AssociatedKeys.navBgView) { () -> UIImageView in
-                let obj = UIImageView()
+            getAssociatedObject(key: &X_AssociatedKeys.navBgView) { () -> _XwgBgView in
+                let obj = _XwgBgView()
                 obj.backgroundColor = kNavBar.navBackgroundColor
                 return obj
             }
@@ -260,10 +271,10 @@ extension UINavigationBar {
     }
     
     /// nav 分隔线
-    var navShadowView:  UIView {
+    private var navShadowView: _XwgShadowView {
         get {
-            getAssociatedObject(key: &X_AssociatedKeys.navShadowView) { () -> UIView in
-                let obj = UIView()
+            getAssociatedObject(key: &X_AssociatedKeys.navShadowView) { () -> _XwgShadowView in
+                let obj = _XwgShadowView()
                 obj.backgroundColor = kNavBar.navShadowColor
                 return obj
             }
@@ -298,7 +309,7 @@ extension UINavigationBar {
     
     /// 设置背景
     /// - Parameter background: XNavigationBar.BackgroundAttribute
-    func update(background: XNavigationBar.BackgroundAttribute) {
+    func setup(background: XNavigationBar.BackgroundAttribute) {
         switch background {
         case .color(let val):
             navBgView.image = nil
@@ -310,7 +321,7 @@ extension UINavigationBar {
     }
     
     /// 更新背景 图片 -> 颜色
-    func setNeedsUpdateBackground(from: UIImage, to: UIColor, progress: CGFloat) {
+    func setupBackground(from: UIImage, to: UIColor, progress: CGFloat) {
         navBgTransitionView.image = from
         navBgTransitionView.backgroundColor = nil
         navBgTransitionView.alpha = 1 - progress
@@ -320,7 +331,7 @@ extension UINavigationBar {
         navBgView.alpha = progress
     }
     /// 更新背景 颜色 -> 图片
-    func setNeedsUpdateBackground(from: UIColor, to: UIImage, progress: CGFloat) {
+    func setupBackground(from: UIColor, to: UIImage, progress: CGFloat) {
         navBgTransitionView.image = nil
         navBgTransitionView.backgroundColor = from
         navBgTransitionView.alpha = 1 - progress
@@ -330,7 +341,7 @@ extension UINavigationBar {
         navBgView.alpha = progress
     }
     
-    func setNeedsUpdateBackground(from: UIImage, to: UIImage, progress: CGFloat) {
+    func setupBackground(from: UIImage, to: UIImage, progress: CGFloat) {
         guard from != to else { return }
         
         navBgTransitionView.image = from
@@ -344,7 +355,7 @@ extension UINavigationBar {
     
     /// 分隔线颜色
     /// - Parameter color: UIColor
-    func update(shadowColor color: UIColor) {
+    func setup(shadowColor color: UIColor) {
         navShadowView.backgroundColor = color
     }
     
@@ -352,7 +363,7 @@ extension UINavigationBar {
     /// - Parameters:
     ///   - alpha: 透明度
     ///   - hasSystemBackIndicator: Bool
-    func setNeedsUpdateBarButtonItems(alpha: CGFloat, hasSystemBackIndicator: Bool) {
+    func setupButtonItems(alpha: CGFloat, hasSystemBackIndicator: Bool) {
         for view in subviews {
             
             let needUpdate: Bool
@@ -385,20 +396,15 @@ extension UINavigationBar {
         x_nav_bar_layoutSubviews()
         
     }
-    
-    var isValid: Bool {
-        if let nav = next?.next as? UINavigationController, nav.isInBlackList {
-            return false
-        } else {
-            return true
-        }
-    }
-    
+
     /// 创建自定义views, 并添加到系统对应层
     @objc func x_nav_bar_didAddSubview(_ subview: UIView) {
         x_nav_bar_didAddSubview(subview)
         
-        guard isValid else { return }
+        // 当前 self 在黑名单
+        if XNavigationBar.isInBlacklist(of: self) { return }
+        // 所在 nav 在黑名单
+        if let nav = next?.next as? UINavigationController, XNavigationBar.isInBlacklist(of: nav) { return }
         
         /*
          默认系统 nav 结构图
@@ -413,64 +419,43 @@ extension UINavigationBar {
         
         // 系统导航背景
         if subview.isMember(of: "_UIBarBackground") {
-                        
-            assert(subview.subviews.count == 2, "系统 _UIBarBackground 子 view 数量异常，请检查")
+            print(self)
+            // 隐藏系统
+            subview.subviews.forEach { $0.isHidden = true }
             
-            // 背景
-            if let ele = subview.subviews.first, ele.isMember(of: "UIVisualEffectView") {
+            // 添加背景
+            do {
+                subview.addSubview(navBgTransitionView)
+                subview.addSubview(navBgView)
                 
-                // 隐藏系统模糊效果
-                ele.subviews.forEach { $0.isHidden = $0.isMember(of: "_UIVisualEffectBackdropView") }
+                navBgTransitionView.translatesAutoresizingMaskIntoConstraints = false
+                NSLayoutConstraint.activate([
+                    navBgTransitionView.leadingAnchor.constraint(equalTo: subview.leadingAnchor),
+                    navBgTransitionView.trailingAnchor.constraint(equalTo: subview.trailingAnchor),
+                    navBgTransitionView.topAnchor.constraint(equalTo: subview.topAnchor),
+                    navBgTransitionView.bottomAnchor.constraint(equalTo: subview.bottomAnchor),
+                ])
                 
-                
-                let contentView = (ele as! UIVisualEffectView).contentView
-                ele.sendSubviewToBack(contentView) // 将 contentView 移到最底层
-                
-                // 添加自定义views
-                do {
-                    contentView.addSubview(navBgTransitionView)
-                    contentView.addSubview(navBgView)
-                    
-                    if #available(iOS 9.0, *) {
-                        navBgTransitionView.translatesAutoresizingMaskIntoConstraints = false
-                        NSLayoutConstraint.activate([
-                            navBgTransitionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-                            navBgTransitionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-                            navBgTransitionView.topAnchor.constraint(equalTo: contentView.topAnchor),
-                            navBgTransitionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-                        ])
-                        
-                        navBgView.translatesAutoresizingMaskIntoConstraints = false
-                        NSLayoutConstraint.activate([
-                            navBgView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-                            navBgView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-                            navBgView.topAnchor.constraint(equalTo: contentView.topAnchor),
-                            navBgView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-                        ])
-                    } else {
-                        fatalError("暂不适配 9.0 以下")
-                    }
-                }
-                
+                navBgView.translatesAutoresizingMaskIntoConstraints = false
+                NSLayoutConstraint.activate([
+                    navBgView.leadingAnchor.constraint(equalTo: subview.leadingAnchor),
+                    navBgView.trailingAnchor.constraint(equalTo: subview.trailingAnchor),
+                    navBgView.topAnchor.constraint(equalTo: subview.topAnchor),
+                    navBgView.bottomAnchor.constraint(equalTo: subview.bottomAnchor),
+                ])
             }
             
-            // 分隔线
-            if let ele = subview.subviews.last, ele.isMember(of: "_UIBarBackgroundShadowView") {
-                ele.isHidden = true
-                
+            // 添加阴影
+            do {
                 subview.addSubview(navShadowView)
                 
-                if #available(iOS 9.0, *) {
-                    navShadowView.translatesAutoresizingMaskIntoConstraints = false
-                    NSLayoutConstraint.activate([
-                        navShadowView.leadingAnchor.constraint(equalTo: subview.leadingAnchor),
-                        navShadowView.trailingAnchor.constraint(equalTo: subview.trailingAnchor),
-                        navShadowView.topAnchor.constraint(equalTo: subview.bottomAnchor),
-                        navShadowView.heightAnchor.constraint(equalToConstant: 1/3.0),
-                    ])
-                } else {
-                    fatalError("暂不适配 9.0 以下")
-                }
+                navShadowView.translatesAutoresizingMaskIntoConstraints = false
+                NSLayoutConstraint.activate([
+                    navShadowView.leadingAnchor.constraint(equalTo: subview.leadingAnchor),
+                    navShadowView.trailingAnchor.constraint(equalTo: subview.trailingAnchor),
+                    navShadowView.topAnchor.constraint(equalTo: subview.bottomAnchor),
+                    navShadowView.heightAnchor.constraint(equalToConstant: 1/3.0),
+                ])
             }
         }
     }
@@ -817,14 +802,9 @@ extension UINavigationController {
 
 // MARK: 控制器 push、pop 更新
 private extension UINavigationController {
-    
-    var isInBlackList: Bool {
-        XNavigationBar.blackList.contains(NSStringFromClass(classForCoder))
-    }
-    
     func setNeedsNavigationBarUpdate(types: [XNavigationBar.Attribute]) {
         
-        guard !isInBlackList else { return }
+        if XNavigationBar.isInBlacklist(of: self) { return }
         
         for type in types {
             switch type {
@@ -832,10 +812,10 @@ private extension UINavigationController {
                 navigationBar.update(title: val)
                 
             case .background(let val):
-                navigationBar.update(background: val)
+                navigationBar.setup(background: val)
                 
             case .shadowColor(let val):
-                navigationBar.update(shadowColor: val)
+                navigationBar.setup(shadowColor: val)
                 
             case .tintColor(let val):
                 navigationBar.tintColor = val
@@ -863,11 +843,11 @@ private extension UINavigationController {
         
         // 更改背景色
         if let from = from.navBackgroundImage, to.navBackgroundImage == nil {
-            navigationBar.setNeedsUpdateBackground(from: from, to: to.navBackgroundColor, progress: progress)
+            navigationBar.setupBackground(from: from, to: to.navBackgroundColor, progress: progress)
         } else if let to = to.navBackgroundImage, from.navBackgroundImage == nil {
-            navigationBar.setNeedsUpdateBackground(from: from.navBackgroundColor, to: to, progress: progress)
+            navigationBar.setupBackground(from: from.navBackgroundColor, to: to, progress: progress)
         } else if let from = from.navBackgroundImage, let to = to.navBackgroundImage {
-            navigationBar.setNeedsUpdateBackground(from: from, to: to, progress: progress)
+            navigationBar.setupBackground(from: from, to: to, progress: progress)
         } else {
             if from.navBackgroundColor != to.navBackgroundColor {
                 setNeedsNavigationBarUpdate(types: [.background(.color(

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import QuickLook
 
 class TestImagePickerController: UIViewController {
 
@@ -19,19 +20,39 @@ class TestImagePickerController: UIViewController {
         navBackgroundImage = UIImage(named: "nav02")
         navShadowColor = .clear
         
-        let btn = UIButton()
-        btn.backgroundColor = .red
-        btn.frame = CGRect(x: 200, y: 0, width: 100, height: 100)
-        view.addSubview(btn)
-        
-        if #available(iOS 14.0, *) {
-            let action = UIAction { btn in
-                self.pushTest()
+        do {
+            let btn = UIButton()
+            btn.backgroundColor = .red
+            btn.frame = CGRect(x: 200, y: 0, width: 100, height: 100)
+            view.addSubview(btn)
+            
+            if #available(iOS 14.0, *) {
+                let action = UIAction { btn in
+                    self.pushTest()
+                }
+                btn.addAction(action, for: .touchUpInside)
+            } else {
+                // Fallback on earlier versions
             }
-            btn.addAction(action, for: .touchUpInside)
-        } else {
-            // Fallback on earlier versions
         }
+        
+        do {
+            let btn = UIButton()
+            btn.backgroundColor = .red
+            btn.frame = CGRect(x: 200, y: 200, width: 100, height: 100)
+            view.addSubview(btn)
+            
+            if #available(iOS 14.0, *) {
+                let action = UIAction { btn in
+                    let path = Bundle.main.path(forResource: "乐橘PRO企业会员协议.pdf", ofType: nil)!
+                    self.previewItems([URL(fileURLWithPath: path)], currentIndex: 0)
+                }
+                btn.addAction(action, for: .touchUpInside)
+            } else {
+                // Fallback on earlier versions
+            }
+        }
+        
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -66,6 +87,13 @@ class TestImagePickerController: UIViewController {
         }
         navigationController?.pushViewController(vc, animated: true)
         
+    }
+    
+    @objc func previewItems(_ items: [URL], currentIndex: Int) {
+        let vc = XQuickPreviewController()
+        vc.items = items
+        vc.currentIndex = currentIndex
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     /*
