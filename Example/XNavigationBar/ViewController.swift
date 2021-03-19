@@ -16,7 +16,7 @@ class ViewController: UIViewController {
         
         view.backgroundColor = .groupTableViewBackground
         
-        navBackgroundImage = UIImage(named: "nav01")
+        navBackground = .image(UIImage(named: "nav01")!)
 
     }
 

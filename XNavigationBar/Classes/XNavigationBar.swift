@@ -35,33 +35,8 @@ public class XNavigationBar: NSObject {
     /// item 的文字颜色
     @objc public var navTintColor: UIColor = .black
     
-    /// 背景色
-    @objc public var navBackgroundColor: UIColor {
-        get {
-            switch navBackground {
-            case .color(let val):   return val
-            default:                return .white
-            }
-        }
-        set {
-            navBackground = .color(newValue)
-        }
-    }
-    
-    /// 背景图, 为 nil 时显示 navBackgroundColor
-    @objc public var navBackgroundImage: UIImage? {
-        get {
-            switch navBackground {
-            case .image(let val):   return val
-            default:                return nil
-            }
-        }
-        set {
-            navBackground = .image(newValue)
-        }
-    }
-    
-    var navBackground: BackgroundAttribute = .color(.white)
+    /// 背景
+    public var navBackground: BackgroundAttribute = .color(.white)
     
     /// nav - 分隔线颜色
     @objc public var navShadowColor: UIColor = UIColor(white: 0, alpha: 0.3)
@@ -92,7 +67,7 @@ extension XNavigationBar {
     
     public enum BackgroundAttribute {
         case color(UIColor)
-        case image(UIImage?)
+        case image(UIImage)
     }
     
     public enum Attribute {
@@ -177,9 +152,6 @@ extension XNavigationBarSwizzle where Self: UINavigationController {
         x_swizzleInstanceMethod(originalSelector: NSSelectorFromString("_updateInteractiveTransition:"),
                                 swizzledSelector: #selector(x_nav_updateInteractiveTransition(_:)))
         
-        x_swizzleInstanceMethod(originalSelector: #selector(getter: preferredStatusBarStyle),
-                                swizzledSelector: #selector(getter: x_nav_preferredStatusBarStyle))
-        
         x_swizzleInstanceMethod(originalSelector: #selector(pushViewController(_:animated:)),
                                 swizzledSelector: #selector(x_nav_pushViewController(_:animated:)))
         
@@ -263,7 +235,12 @@ extension UINavigationBar {
         get {
             getAssociatedObject(key: &X_AssociatedKeys.navBgView) { () -> _XwgBgView in
                 let obj = _XwgBgView()
-                obj.backgroundColor = kNavBar.navBackgroundColor
+                switch kNavBar.navBackground {
+                case .color(let val):
+                    obj.backgroundColor = val
+                case .image(let val):
+                    obj.image = val
+                }
                 return obj
             }
         }
@@ -296,15 +273,14 @@ extension UINavigationBar {
         switch title {
         case .color(let val):
             attributes[.foregroundColor] = val
-            update(title: .attributes(attributes))
+            titleTextAttributes = attributes
         case .font(let val):
-            attributes[.foregroundColor] = val
+            attributes[.font] = val
             titleTextAttributes = attributes
         case .attributes(let val):
             val.forEach { attributes[$0.key] = $0.value }
+            titleTextAttributes = attributes
         }
-        
-        titleTextAttributes = attributes
     }
     
     /// 设置背景
@@ -541,28 +517,6 @@ extension UIViewController {
         }
     }
     
-    @objc public var navBackgroundColor: UIColor {
-        get {
-            switch navBackground {
-            case .color(let val):   return val
-            default:                return kNavBar.navBackgroundColor
-            }
-        }
-        set {
-            navBackground = .color(newValue)
-        }
-    }
-    @objc public var navBackgroundImage: UIImage? {
-        get {
-            switch navBackground {
-            case .image(let val):   return val
-            default:                return kNavBar.navBackgroundImage
-            }
-        }
-        set {
-            navBackground = .image(newValue)
-        }
-    }
     public var navBackground: XNavigationBar.BackgroundAttribute {
         get {
             getAssociatedObject(key: &X_AssociatedKeys.navBackground, default: { kNavBar.navBackground })
@@ -616,7 +570,11 @@ extension UIViewController {
     
     /// 交换后的方法
     @objc fileprivate var x_preferredStatusBarStyle: UIStatusBarStyle {
-        statusBarStyle
+        if let nav = self as? UINavigationController {
+            return nav.topViewController?.preferredStatusBarStyle ?? kNavBar.statusBarStyle
+        } else {
+            return statusBarStyle
+        }
     }
     
     /// 替换系统方法: viewWillAppear(_:)
@@ -784,20 +742,12 @@ extension UINavigationController {
         guard popConfig.isNeedUpdate else { return }
         
         let progress = popConfig.progress
-        if let fromVC = coordinator.viewController(forKey: .from),
-            let toVC = coordinator.viewController(forKey: .to) {
-            navigationBarUpdate(from: fromVC, to: toVC, progress: progress)
+        if let from = coordinator.viewController(forKey: .from),
+            let to = coordinator.viewController(forKey: .to) {
+            navigationBarUpdate(from: from, to: to, progress: progress)
         }
     }
     
-}
-
-// MARK: 状态栏设置
-extension UINavigationController {
-    /// 设置状态栏颜色
-    @objc fileprivate var x_nav_preferredStatusBarStyle: UIStatusBarStyle {
-        topViewController?.preferredStatusBarStyle ?? kNavBar.statusBarStyle
-    }
 }
 
 // MARK: 控制器 push、pop 更新
@@ -835,24 +785,31 @@ private extension UINavigationController {
     }
     
     func navigationBarUpdate(from: UIViewController, to: UIViewController, progress: CGFloat) {
-
+        
         setNeedsNavigationBarUpdate(types: [
             .tintColor(transitionColor(from: from.navTintColor, to: to.navTintColor, percent: progress)),
             .shadowColor(transitionColor(from: from.navShadowColor, to: to.navShadowColor, percent: progress))
         ])
         
         // 更改背景色
-        if let from = from.navBackgroundImage, to.navBackgroundImage == nil {
-            navigationBar.setupBackground(from: from, to: to.navBackgroundColor, progress: progress)
-        } else if let to = to.navBackgroundImage, from.navBackgroundImage == nil {
-            navigationBar.setupBackground(from: from.navBackgroundColor, to: to, progress: progress)
-        } else if let from = from.navBackgroundImage, let to = to.navBackgroundImage {
-            navigationBar.setupBackground(from: from, to: to, progress: progress)
-        } else {
-            if from.navBackgroundColor != to.navBackgroundColor {
+        let from_navBgImage: UIImage?
+        let to_navBgImage: UIImage?
+        switch from.navBackground {
+        case .color(let from):
+            switch to.navBackground {
+            case .color(let to):
                 setNeedsNavigationBarUpdate(types: [.background(.color(
-                    transitionColor(from: from.navBackgroundColor, to: to.navBackgroundColor, percent: progress)
+                    transitionColor(from: from, to: to, percent: progress)
                 ))])
+            case .image(let to):
+                navigationBar.setupBackground(from: from, to: to, progress: progress)
+            }
+        case .image(let from):
+            switch to.navBackground {
+            case .color(let to):
+                navigationBar.setupBackground(from: from, to: to, progress: progress)
+            case .image(let to):
+                navigationBar.setupBackground(from: from, to: to, progress: progress)
             }
         }
     }
@@ -944,41 +901,31 @@ extension UINavigationController: UINavigationBarDelegate {
 }
 
 // MARK: UINavigationControllerDelegate
-extension UINavigationController: UINavigationControllerDelegate {
+// 此处对 NSObject 扩展是为了避免 nav 的代理不是 nav 本身
+extension NSObject: UINavigationControllerDelegate {
     /// https://www.jianshu.com/p/94910b42396c
     /// 处理滑动返回手指松开后， 系统自动处理过程中 自动操作的那个时间内将透明度变为对应界面的导航栏透明度，让其变化的不那么跳跃
     public func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
         
-        guard let coordinator = transitionCoordinator else { return }
+        guard let transitionCoordinator = navigationController.transitionCoordinator else { return }
         
-        func dealInteractionChanges(_ context: UIViewControllerTransitionCoordinatorContext) {
+        let handle: (UIViewControllerTransitionCoordinatorContext) -> Void = { ctx in
             
-            let animations: (UITransitionContextViewControllerKey) -> Void = { key in
-                
-                let from = context.viewController(forKey: .from)!
-                let to = context.viewController(forKey: .to)!
-                
-                let progress: CGFloat = context.isCancelled ? 0 : 1.0
+            guard let from = ctx.viewController(forKey: .from), let to = ctx.viewController(forKey: .to) else { return }
+            
+            let percent = ctx.isCancelled ? ctx.percentComplete : (1 - ctx.percentComplete)
+            let duration = ctx.transitionDuration * Double(percent)
+            
+            let progress: CGFloat = ctx.isCancelled ? 0 : 1.0
+            UIView.animate(withDuration: duration) {
                 navigationController.navigationBarUpdate(from: from, to: to, progress: progress)
-            }
-            
-            if context.isCancelled {
-                let duration = context.transitionDuration * Double(context.percentComplete)
-                UIView.animate(withDuration: duration) { animations(.from) }
-            } else {
-                let duration = context.transitionDuration * Double(1 - context.percentComplete)
-                UIView.animate(withDuration: duration) { animations(.to) }
             }
         }
         
         if #available(iOS 10.0, *) {
-            coordinator.notifyWhenInteractionChanges { context in
-                dealInteractionChanges(context)
-            }
+            transitionCoordinator.notifyWhenInteractionChanges(handle)
         } else {
-            coordinator.notifyWhenInteractionEnds { context in
-                dealInteractionChanges(context)
-            }
+            transitionCoordinator.notifyWhenInteractionEnds(handle)
         }
     }
 }

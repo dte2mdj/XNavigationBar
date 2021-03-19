@@ -17,7 +17,7 @@ class TestImagePickerController: UIViewController {
         view.backgroundColor = .cyan
         
         statusBarStyle = .default
-        navBackgroundImage = UIImage(named: "nav02")
+        navBackground = .image(UIImage(named: "nav02")!)
         navShadowColor = .clear
         
         do {
@@ -72,10 +72,8 @@ class TestImagePickerController: UIViewController {
     func pushTest() {
         
         let vc = UIViewController()
-        vc.navBackgroundImage = UIImage(named: "nav01")!
-        vc.navBackgroundColor = .cyan
+        vc.navBackground = .color(.cyan)
         vc.navTintColor = .red
-        vc.navTitleColor = .orange
         vc.title = "小小一只鸟"
         vc.view.backgroundColor = .blue
         vc.navigationItem.leftItemsSupplementBackButton = true // 设置 leftBarButtonItem 不会占用掉返回按钮
