@@ -395,6 +395,11 @@ extension UINavigationBar {
     @objc func x_nav_bar_layoutSubviews() {
         x_nav_bar_layoutSubviews()
         
+        subviews.first?.subviews.forEach({ ele in
+            if ![navBgTransitionView, navBgView, navShadowView].contains(ele) {
+                ele.isHidden = true
+            }
+        })
     }
 
     /// 创建自定义views, 并添加到系统对应层
