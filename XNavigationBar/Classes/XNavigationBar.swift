@@ -305,6 +305,12 @@ extension UINavigationBar {
         }
         
         titleTextAttributes = attributes
+        if #available(iOS 13.0, *) {
+            let appearance = UINavigationBarAppearance()
+            appearance.titleTextAttributes = attributes
+            standardAppearance = appearance
+            scrollEdgeAppearance = appearance
+        }
     }
     
     /// 设置背景
@@ -394,12 +400,12 @@ extension UINavigationBar {
     
     @objc func x_nav_bar_layoutSubviews() {
         x_nav_bar_layoutSubviews()
-        
-        subviews.first?.subviews.forEach({ ele in
-            if ![navBgTransitionView, navBgView, navShadowView].contains(ele) {
-                ele.isHidden = true
-            }
-        })
+        // 如果出现导航栏无法正常隐藏，再打开测试是否正常
+        // subviews.first?.subviews.forEach({ ele in
+        //     if ![navBgTransitionView, navBgView, navShadowView].contains(ele) {
+        //         ele.isHidden = true
+        //     }
+        // })
     }
 
     /// 创建自定义views, 并添加到系统对应层
