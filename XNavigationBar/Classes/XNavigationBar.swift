@@ -400,11 +400,10 @@ extension UINavigationBar {
     
     @objc func x_nav_bar_layoutSubviews() {
         x_nav_bar_layoutSubviews()
-         subviews.first?.subviews.forEach({ ele in
-             if ![navBgTransitionView, navBgView, navShadowView].contains(ele) {
-                 ele.isHidden = true
-             }
-         })
+//        subviews.first?.subviews.forEach({ ele in
+//            guard ![navBgTransitionView, navBgView, navShadowView].contains(ele) else { return }
+//            ele.subviews.forEach { $0.isHidden = true }
+//        })
     }
 
     /// 创建自定义views, 并添加到系统对应层
@@ -431,7 +430,10 @@ extension UINavigationBar {
         if subview.isMember(of: "_UIBarBackground") {
             print(self)
             // 隐藏系统
-            subview.subviews.forEach { $0.isHidden = true }
+            subview.subviews.forEach {
+                $0.isHidden = true
+                $0.subviews.forEach { $0.isHidden = true }
+            }
             
             // 添加背景
             do {
@@ -658,8 +660,6 @@ extension UIViewController {
     
     @objc fileprivate func x_present(_ viewControllerToPresent: UIViewController, animated: Bool, completion: (() -> Void)? = nil) {
         defer { x_present(viewControllerToPresent, animated: animated, completion: completion) }
-        
-        print(#function)
     }
     
 }
@@ -888,10 +888,26 @@ private extension UINavigationController {
         var to_a: CGFloat = 0
         to.getRed(&to_r, green: &to_g, blue: &to_b, alpha: &to_a)
         
-        let r = from_r + (to_r - from_r) * percent
-        let g = from_g + (to_g - from_g) * percent
-        let b = from_b + (to_b - from_b) * percent
-        let a = from_a + (to_a - from_a) * percent
+        let r: CGFloat
+        let g: CGFloat
+        let b: CGFloat
+        let a: CGFloat
+        if from == .clear {
+            r = to_r
+            g = to_g
+            b = to_b
+            a = to_a * percent
+        } else if to == .clear {
+            r = from_r
+            g = from_g
+            b = from_b
+            a = from_a * (1 - percent)
+        } else {
+            r = from_r + (to_r - from_r) * percent
+            g = from_g + (to_g - from_g) * percent
+            b = from_b + (to_b - from_b) * percent
+            a = from_a + (to_a - from_a) * percent
+        }
         
         return UIColor(red: r, green: g, blue: b, alpha: a)
     }
