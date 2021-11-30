@@ -33,7 +33,19 @@ public class XNavigationBar: NSObject {
         .foregroundColor: UIColor.black
     ]
     /// item 的文字颜色
-    @objc public var navTintColor: UIColor = .black
+    @objc public var navTintColor: UIColor {
+        get {
+            barButtonItemAttributes[.foregroundColor] as? UIColor ?? .black
+        }
+        set {
+            barButtonItemAttributes[.foregroundColor] = newValue
+        }
+    }
+    
+    @objc public var barButtonItemAttributes: [NSAttributedString.Key: Any] = [
+        .foregroundColor: UIColor.black,
+        .font: UIFont.systemFont(ofSize: 14)
+    ]
     
     /// 背景色
     @objc public var navBackgroundColor: UIColor {
@@ -306,10 +318,16 @@ extension UINavigationBar {
         
         titleTextAttributes = attributes
         if #available(iOS 13.0, *) {
-            let appearance = UINavigationBarAppearance()
-            appearance.titleTextAttributes = attributes
-            standardAppearance = appearance
-            scrollEdgeAppearance = appearance
+            standardAppearance.titleTextAttributes = attributes
+        }
+    }
+    
+    func update(tintColor: UIColor) {
+        self.tintColor = tintColor
+        if #available(iOS 13.0, *) {
+            var attributes = kNavBar.barButtonItemAttributes
+            attributes[.foregroundColor] = tintColor
+            standardAppearance.buttonAppearance.normal.titleTextAttributes = attributes
         }
     }
     
@@ -828,7 +846,7 @@ private extension UINavigationController {
                 navigationBar.setup(shadowColor: val)
                 
             case .tintColor(let val):
-                navigationBar.tintColor = val
+                navigationBar.update(tintColor: val)
             }
         }
     }
