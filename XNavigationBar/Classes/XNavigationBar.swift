@@ -318,17 +318,17 @@ extension UINavigationBar {
         
         titleTextAttributes = attributes
         if #available(iOS 13.0, *) {
-            standardAppearance.titleTextAttributes = attributes
+            let appearance = UINavigationBarAppearance()
+            appearance.titleTextAttributes = attributes
+            appearance.buttonAppearance.normal.titleTextAttributes = kNavBar.barButtonItemAttributes
+            standardAppearance = appearance
+            scrollEdgeAppearance = appearance
         }
     }
     
-    func update(tintColor: UIColor) {
-        self.tintColor = tintColor
-        if #available(iOS 13.0, *) {
-            var attributes = kNavBar.barButtonItemAttributes
-            attributes[.foregroundColor] = tintColor
-            standardAppearance.buttonAppearance.normal.titleTextAttributes = attributes
-        }
+    func update(tintColor color: UIColor) {
+        tintColor = color
+        kNavBar.barButtonItemAttributes[.foregroundColor] = color
     }
     
     /// 设置背景
