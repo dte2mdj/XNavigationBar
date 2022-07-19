@@ -320,7 +320,9 @@ extension UINavigationBar {
         if #available(iOS 13.0, *) {
             let appearance = UINavigationBarAppearance()
             appearance.titleTextAttributes = attributes
-            appearance.buttonAppearance.normal.titleTextAttributes = kNavBar.barButtonItemAttributes
+            var barButtonItemAttributes = kNavBar.barButtonItemAttributes
+            barButtonItemAttributes[.foregroundColor] = tintColor
+            appearance.buttonAppearance.normal.titleTextAttributes = barButtonItemAttributes
             standardAppearance = appearance
             scrollEdgeAppearance = appearance
         }
@@ -328,7 +330,6 @@ extension UINavigationBar {
     
     func update(tintColor color: UIColor) {
         tintColor = color
-        kNavBar.barButtonItemAttributes[.foregroundColor] = color
     }
     
     /// 设置背景
