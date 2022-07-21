@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'XNavigationBar'
-  s.version          = '0.1.2'
+  s.version          = '0.1.7'
   s.summary          = '设置状态栏、导航栏按钮、标题、颜色、透明度'
 
 # This description is used to generate tags and improve search results.
@@ -30,7 +30,7 @@ TODO: Add long description of the pod here.
 
   s.swift_version = '5.0'
   
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '11.0'
 
   s.source_files = 'XNavigationBar/Classes/**/*'
   

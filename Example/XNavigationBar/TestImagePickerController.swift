@@ -7,17 +7,52 @@
 //
 
 import UIKit
+import QuickLook
 
 class TestImagePickerController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .red
+        view.backgroundColor = .cyan
         
         statusBarStyle = .default
-        navBackgroundImage = nil
-        navBackgroundColor = .yellow
+        navBackgroundImage = UIImage(named: "nav02")
+        navShadowColor = .clear
+        
+        do {
+            let btn = UIButton()
+            btn.backgroundColor = .red
+            btn.frame = CGRect(x: 200, y: 0, width: 100, height: 100)
+            view.addSubview(btn)
+            
+            if #available(iOS 14.0, *) {
+                let action = UIAction { btn in
+                    self.pushTest()
+                }
+                btn.addAction(action, for: .touchUpInside)
+            } else {
+                // Fallback on earlier versions
+            }
+        }
+        
+        do {
+            let btn = UIButton()
+            btn.backgroundColor = .red
+            btn.frame = CGRect(x: 200, y: 200, width: 100, height: 100)
+            view.addSubview(btn)
+            
+            if #available(iOS 14.0, *) {
+                let action = UIAction { btn in
+                    let path = Bundle.main.path(forResource: "乐橘PRO企业会员协议.pdf", ofType: nil)!
+                    self.previewItems([URL(fileURLWithPath: path)], currentIndex: 0)
+                }
+                btn.addAction(action, for: .touchUpInside)
+            } else {
+                // Fallback on earlier versions
+            }
+        }
+        
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -32,6 +67,33 @@ class TestImagePickerController: UIViewController {
     
     @IBAction func photoButtonEvent(_ sender: Any) {
         showImagePickerController()
+    }
+    
+    func pushTest() {
+        
+        let vc = UIViewController()
+        vc.navBackgroundImage = UIImage(named: "nav01")!
+        vc.navBackgroundColor = .cyan
+        vc.navTintColor = .red
+        vc.navTitleColor = .orange
+        vc.title = "小小一只鸟"
+        vc.view.backgroundColor = .blue
+        vc.navigationItem.leftItemsSupplementBackButton = true // 设置 leftBarButtonItem 不会占用掉返回按钮
+        
+        if #available(iOS 14.0, *) {
+            vc.navigationItem.leftBarButtonItem = UIBarButtonItem(systemItem: .bookmarks)
+        } else {
+            // Fallback on earlier versions
+        }
+        navigationController?.pushViewController(vc, animated: true)
+        
+    }
+    
+    @objc func previewItems(_ items: [URL], currentIndex: Int) {
+        let vc = XQuickPreviewController()
+        vc.items = items
+        vc.currentIndex = currentIndex
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     /*
@@ -53,14 +115,13 @@ extension TestImagePickerController: TZImagePickerControllerDelegate {
     func showImagePickerController() {
       
         let imagePicker = TZImagePickerController(
-            maxImagesCount: 1,
+            maxImagesCount: 9,
             columnNumber: 3,
             delegate: self,
             pushPhotoPickerVc: true)!
         
-        imagePicker.navTitleColor = .blue
-        imagePicker.barItemTextColor = navTintColor
-        imagePicker.naviBgColor = navBackgroundColor
+//        imagePicker.barItemTextColor = navTintColor
+//        imagePicker.navBackgroundColor = .orange
         
         imagePicker.allowPickingOriginalPhoto = false
         imagePicker.allowPickingVideo = false
