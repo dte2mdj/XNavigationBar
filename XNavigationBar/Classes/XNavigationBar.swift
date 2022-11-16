@@ -84,7 +84,13 @@ public class XNavigationBar: NSObject {
     /// 黑名单
     @objc public static var blacklist: [String] = [
         "TZImagePickerController",
-        "_UIActivityContentNavigationBar"
+        "_UIActivityContentNavigationBar",
+        "QLPreviewCollection",
+        "QLPreviewController",
+        "QLPageViewController",
+        "QLItemPresenterViewController",
+        "QLErrorItemViewController",
+        "QLRemotePreviewCollection",
     ]
     
     static func isInBlacklist(of object: NSObject) -> Bool {
@@ -655,6 +661,9 @@ extension UIViewController {
         defer { x_viewWillAppear(animated) }
         
         isPushToNextFinished = false
+        
+        if XNavigationBar.isInBlacklist(of: self) { return }
+        
         navigationController?.setNeedsNavigationBarUpdate(types: [
             .title(.attributes(navTitleAttributes)),
             .tintColor(navTintColor)
